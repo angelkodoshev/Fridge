@@ -1,0 +1,66 @@
+defmodule GenserverTest do
+use GenServer
+
+def init(num) do
+{:ok,num}
+end
+
+
+def handle_cast({:add,num},cur_num) do
+{:noreply,(cur_num*num)}
+end
+
+
+def handle_cast({:transform,fun},cur_num) do
+{:noreply,fun.(cur_num)}
+end
+
+def handle_cast({:print,fun},cur_num) do
+{:moreply,fun.(fun.(cur_num))}
+end
+
+def handle_call(:status,_from,cur_num) do
+{:reply,cur_num,cur_num}
+end
+
+
+
+
+
+def init(prod)do
+{:ok,prod}
+
+end
+
+
+
+def handle_cast({:add,new_item},cur_prod) do
+new_prod=[new_item | cur_prod]
+{:noreply,new_prod,cur_prod}
+end
+
+
+
+
+def handle_cast({:take,prod},cur_prod) do
+{response,new_prod}=
+if Enum.each?(cur_prod,fn x->x==prod end) do
+new_prod=List.delete(cur_prod,prod)
+{{prod,new_prod},new_prod}
+else
+{:error,cur_prod}
+and
+{:noreply,response,new_prod}
+end
+
+
+
+def handle_call({:status,prod},_from,cur_prod ) do
+{:reply,[prod | cur_prod]}
+end
+
+
+
+end
+
+
